@@ -1,0 +1,24 @@
+# Keep the build context small and free of secrets.
+.git
+.gitignore
+.env
+*.local
+
+# Service-account credentials are mounted at runtime, never built into the image.
+credentials.json
+service-account*.json
+*.sa.json
+
+# Docs and planning artifacts are not needed to build the binary.
+README.md
+TASK.md
+docs/
+
+# Test / coverage artifacts.
+*.test
+*.out
+coverage.*
+*.coverprofile
+profile.cov
+
+.DS_Store

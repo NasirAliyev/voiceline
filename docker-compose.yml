@@ -1,0 +1,24 @@
+# One-command spin-up. With the default DESTINATION=log the service needs only
+# OPENAI_API_KEY in .env and no external accounts.
+services:
+  voiceline:
+    build:
+      context: .
+      target: runtime
+    image: voiceline:latest
+    env_file: .env
+    # Host and container share the same port so a custom PORT in .env just works
+    # (the app, the published port, and the healthcheck all read PORT).
+    ports:
+      - "${PORT:-8080}:${PORT:-8080}"
+    restart: unless-stopped
+
+    # --- Google Sheets destination (driven entirely by .env, no edits here) ----
+    # When GOOGLE_APPLICATION_CREDENTIALS is set in .env (e.g. ./credentials.json),
+    # that host file is mounted read-only and the app is pointed at it inside the
+    # container. When it is empty (the default log destination), the harmless
+    # /dev/null fallback is mounted and the in-container var stays empty.
+    volumes:
+      - ${GOOGLE_APPLICATION_CREDENTIALS:-/dev/null}:/secrets/credentials.json:ro
+    environment:
+      GOOGLE_APPLICATION_CREDENTIALS: ${GOOGLE_APPLICATION_CREDENTIALS:+/secrets/credentials.json}
